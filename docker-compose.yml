@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  app:
+    build: ./app    
+    volumes:
+      - ./app/:/usr/src/app/
+    networks:
+      - app-network
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+  db:
+    image: postgres:15
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - 5432:5432
+    networks:
+      - app-network
+    
+    environment:  
+      - POSTGRES_USER=${PSQL_DB_USER}
+      - POSTGRES_PASSWORD=${PSQL_DB_PWD}
+      - POSTGRES_DB=${PSQL_DB_NAME}
+
+networks:
+  app-network:
+
+volumes:
+  postgres_data:
